@@ -560,24 +560,23 @@ AddEventHandler('mecanico:factura', function()
     local playerPed = PlayerPedId()
     local vehicle   = ESX.Game.GetVehicleInDirection()
     local coords    = GetEntityCoords(playerPed)
+--
+ESX.UI.Menu.Open('dialog', GetCurrentResourceName(), 'billing', {
+	title = 'Facuta mecanico'
+}, function(data, menu)
+	local amount = tonumber(data.value)
 
-    local keyboard = exports["nh-keyboard"]:KeyboardInput({
-        header = "Factura Mecanico",
-        rows = {
-            {
-                id = 0,
-                txt = 'Cantidad'
-            }
-        }
-    })
-    if keyboard ~= nil then
-        if keyboard[1].input == nil then 
-            ESX.ShowNotification('Ningun precio fue puesto')
-            return 
-        end
-        TriggerServerEvent('esx_billing:sendBill', GetPlayerServerId(closestPlayer), 'society_mechanic', 'Mecanico | Factura', keyboard[1].input)
-    end
-
+	if amount == nil or amount < 0 then
+		ESX.ShowNotification('Cantidad invalida')
+	else
+		local closestPlayer, closestDistance = ESX.Game.GetClosestPlayer()
+		if closestPlayer == -1 or closestDistance > 3.0 then
+			ESX.ShowNotification('Ningun jugador cerca)
+		else
+			menu.close()
+			TriggerServerEvent('esx_billing:sendBill', GetPlayerServerId(closestPlayer), 'society_mechanic', 'Mecanico', amount)
+		end
+	end
 end)
 
 
