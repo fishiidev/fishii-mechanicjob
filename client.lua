@@ -577,6 +577,9 @@ ESX.UI.Menu.Open('dialog', GetCurrentResourceName(), 'billing', {
 			TriggerServerEvent('esx_billing:sendBill', GetPlayerServerId(closestPlayer), 'society_mechanic', 'Mecanico', amount)
 		end
 	end
+end, function(data, menu)
+		menu.close()
+	end)
 end)
 
 
