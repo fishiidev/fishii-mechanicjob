@@ -8,7 +8,7 @@ es_extended
 esx_society
 esx_billing
 esx_addoninventory
-esx_addonacountmoney
+esx_addonaccount
 ```
 More things will be coming out
 
