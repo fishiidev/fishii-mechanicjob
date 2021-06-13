@@ -571,7 +571,7 @@ ESX.UI.Menu.Open('dialog', GetCurrentResourceName(), 'billing', {
 	else
 		local closestPlayer, closestDistance = ESX.Game.GetClosestPlayer()
 		if closestPlayer == -1 or closestDistance > 3.0 then
-			ESX.ShowNotification('Ningun jugador cerca)
+			ESX.ShowNotification('Ningun jugador cerca')
 		else
 			menu.close()
 			TriggerServerEvent('esx_billing:sendBill', GetPlayerServerId(closestPlayer), 'society_mechanic', 'Mecanico', amount)
