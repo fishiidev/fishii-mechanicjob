@@ -3,7 +3,6 @@
 Dependencies:
 ```
 nh-context
-nh-keyboard
 es_extended
 esx_society
 esx_billing
