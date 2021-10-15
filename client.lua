@@ -19,19 +19,43 @@ AddEventHandler('esx:setJob', function(job)
     PlayerData.job = job
 end)
 
+
 Citizen.CreateThread(function()
     while true do 
         local _msec = 250
         if PlayerData.job and PlayerData.job.name == 'mechanic' then
             _msec = 0
             if IsControlJustPressed(0, 167) then
-                ESX.ShowNotification('💀| Menú Mecanico')
-                TriggerEvent('fishii-contextmenu')
+                ESX.ShowNotification('🙌| Menú Mecanico', "success")
+                ESX.UI.Menu.Open('default', GetCurrentResourceName(), 'menu', {
+                    title = "Menu Mecanico",
+                    subtitle= "Menu LSCustom",
+                    align = "right",
+                    elements = {
+                        {label ="Reparar", value = "repair"},
+                        {label ="Limpiar", value = "limpiar"},
+                        {label ="Facturar", value = "facturar"},
+                    }
+                }, function(data,menu)
+                    local c = data.current
+                    if data.current.value == "repair" then
+                        TriggerEvent('mecanico:reparar')
+                    elseif data.current.value == "limpiar" then
+                        TriggerEvent('mecanico:limpiar')
+                    elseif data.current.value == "facturar" then
+                        TriggerEvent('mecanico:factura')
+                    end
+
+                end, function(data,menu)
+                    menu.close()
+                end)
             end
         end
         Citizen.Wait(_msec)
     end
 end)
+
+
 
 Citizen.CreateThread(function()
     while true do
@@ -44,7 +68,26 @@ Citizen.CreateThread(function()
                 if PlayerData.job and PlayerData.job.name == 'mechanic' then
                     ESX.ShowFloatingHelpNotification('~b~[E]~w~ | Props', v)
                     if IsControlJustPressed(0,38) then
-                        TriggerEvent('fishii-propmenu')
+                        ESX.UI.Menu.Open('default', GetCurrentResourceName(), 'menu', {
+                            title = "Menu Mecanico",
+                            subtitle= "Menu props",
+                            align = "right",
+                            elements = {
+                                {label ="Llanta", value = "llanta"},
+                                {label ="Puerta", value = "puerta"},
+                            }
+                        }, function(data,menu)
+                            local c = data.current
+                            if data.current.value == "puerta" then
+                                TriggerEvent('mecanico:prop', {prop = "door"})
+                            elseif data.current.value == "llanta" then
+                                TriggerEvent('mecanico:prop', {prop = "tire"})
+
+                            end
+        
+                        end, function(data,menu)
+                            menu.close()
+                        end)
                     end
                 end
             end
@@ -56,7 +99,68 @@ Citizen.CreateThread(function()
                 if PlayerData.job and PlayerData.job.name == 'mechanic' then
                     ESX.ShowFloatingHelpNotification('~b~[E]~w~ | Menu General', v)
                     if IsControlJustPressed(0,38) then
-                        TriggerEvent('fishii-general')
+                        ESX.UI.Menu.Open('default', GetCurrentResourceName(), 'menu', {
+                            title = "Menu Mecanico",
+                            subtitle= "Menu General",
+                            align = "right",
+                            elements = {
+                                {label ="Outfit de trabajo", value = "outfits"},
+                                {label ="Outfits Guardados", value = "casual"},
+                                {label ="Regresar a ropa civil", value = "civil"},
+                                {label = '<span style="color: lightblue;">-------</span> Organizacion <span style="color: lightblue;">-------</span>'},
+                                {label = "Sociedad", value ="society"},
+                                {label = "Inventario", value ="inventory"},
+                                {label = "Vehiculos", value = "vehicles"},
+
+                            }
+                        }, function(data,menu)
+                            local c = data.current
+                            if data.current.value == "outfits" then
+                                TriggerEvent('mecanico:outfits', {outfits = "trabajo"})
+                            elseif data.current.value == "civil" then
+                                TriggerEvent('mecanico:outfits', {outfits = "normal"})
+                            elseif data.current.value == "casual" then
+                                TriggerEvent('mecanico:outfits', {outfits = "casual"})
+                            elseif data.current.value == "society" then
+                                TriggerEvent('mecanico:sociedad')
+                            elseif data.current.value == "inventory" then
+                                TriggerEvent('mecanico:inventario')
+                                menu.close()
+                            elseif data.current.value == "vehicles" then
+                                menu.close()
+                                ESX.UI.Menu.Open('default', GetCurrentResourceName(), 'menu2', {
+                                    title = "Menu Mecanico",
+                                    subtitle = "Menu Vehiculos",
+                                    align = "right",
+                                    elements = {
+                                        {label = "SlamVan", value = "slamvan"},
+                                        {label = "Flatbed", value = "flatbed"},
+                                        {label = "TowTruck", value = "towtruck"},
+                                        {label = "Bison", value = "bison"},
+                                    }
+                                }, function(data2,menu2)
+                                    if data2.current.value == "slamvan" then
+                                        menu2.close()
+                                        TriggerEvent('mecanico:carro', {carro = "slamvan"})
+                                    elseif data2.current.value == "flatbed" then
+                                        menu2.close()
+                                        TriggerEvent('mecanico:carro', {carro = "flatbed"})
+                                    elseif data2.current.value == "towtruck" then
+                                        menu2.close()
+                                        TriggerEvent('mecanico:carro', {carro = "towtruck2"})
+                                    elseif data2.current.value == "bison" then
+                                        menu2.close()
+                                        TriggerEvent('mecanico:carro', {carro = "bison2"})
+                                    end
+
+                                end, function(data2, menu2)
+                                    menu2.close()
+                                end)
+                            end
+        
+                        end, function(data,menu)
+                            menu.close()
+                        end)
                     end
                 end
             end
@@ -79,196 +183,6 @@ Citizen.CreateThread(function()
 end)
 
 
-RegisterNetEvent('fishii-propmenu', function()
-    TriggerEvent('nh-context:sendMenu', {
-        {
-            id = 1,
-            header = "Menú Props",
-            txt = "",
-        },
-        {
-            id = 2,
-            header = "Puerta",
-            txt = "Una puerta idiota",
-            params = {
-                event = "mecanico:prop",
-                args = {
-                    prop = 'door'
-                }
-            }
-        },
-        {
-            id = 3,
-            header = "Llanta",
-            txt = "Una llanta michelin",
-            params = {
-                event = "mecanico:prop",
-                args = {
-                    prop = 'tire'
-                }
-            }
-        },
-    })
-end)
-RegisterNetEvent('fishii-contextmenu', function()
-    TriggerEvent('nh-context:sendMenu', {
-        {
-            id = 1,
-            header = "Menú Mecanico",
-            txt = "",
-        },
-        {
-            id = 2,
-            header = "Reparar",
-            txt = "Reparar Vehiculo",
-            params = {
-                event = "mecanico:reparar"
-            }
-        },
-        {
-            id = 3,
-            header = "Limpiar",
-            txt = "Limpiar Vehiculo",
-            params = {
-                event = "mecanico:limpiar"
-            }
-        },
-        {
-            id = 4,
-            header = "Facturas",
-            txt = "Factura vehiculo",
-            params = {
-                event = "mecanico:factura"
-            }
-        },
-    })
-end)
-RegisterNetEvent('fishii-general', function()
-    TriggerEvent('nh-context:sendMenu', {
-        {
-            id = 1,
-            header = "Menú General",
-            txt = "",
-        },
-        --[[
-        {
-            id = 2,
-            header = "Outfit de trabajo",
-            txt = "Ropa de Trabajador",
-            params = {
-                event = "mecanico:outfits",
-                args = {
-                    outfits = "trabajo"
-                }
-            }
-        },
-        --]]
-        {
-            id = 3,
-            header = "Vestimentas",
-            txt = "Tus vestimentas",
-            params = {
-                event = "mecanico:outfits",
-                args = {
-                    outfits = "casual"
-                }
-            }
-        },
-        {
-            id = 4,
-            header = "Meter Items",
-            txt = "Inventario Mecanico",
-            params = {
-                event = "mecanico:inventario",
-                args = {
-                    invOpcion = "meter"
-                }
-            }
-        },
-        {
-            id = 5,
-            header = "Sacar Items",
-            txt = "Inventario Mecanico",
-            params = {
-                event = "mecanico:inventario",
-                args = {
-                    invOpcion = "sacar"
-                }
-            }
-        },
-        {
-            id = 7,
-            header = "Vehiculos",
-            txt = "Maneja tus vehiculos de sociedad",
-            params = {
-                event = "fishii-vehiculos"
-            }
-        },
-
-        {
-            id = 8,
-            header = "Sociedad",
-            txt = "Maneja tu sociedad",
-            params = {
-                event = "mecanico:sociedad"
-            }
-        },
-    })
-end)
-RegisterNetEvent('fishii-vehiculos', function()
-    TriggerEvent('nh-context:sendMenu', {
-        {
-            id = 0,
-            header = 'Vehiculos',
-            txt = ''
-        },
-        {
-            id = 1,
-            header = "Slamvan",
-            txt = 'Slamvan',
-            params = {
-                event = "mecanico:carro",
-                args = {
-                    carro = 'slamvan4'
-                }
-            }
-        },
-        {
-            id = 2,
-            header = "Flatbed",
-            txt = 'Flatbed',
-            params = {
-                event = "mecanico:carro",
-                args = {
-                    carro = 'flatbed'
-                }
-            }
-        },
-        {
-            id = 2,
-            header = "Tow Truck",
-            txt = 'Tow Truck',
-            params = {
-                event = "mecanico:carro",
-                args = {
-                    carro = 'towtruck2'
-                }
-            }
-        },
-        {
-            id = 4,
-            header = "Bison",
-            txt = 'Bison',
-            params = {
-                event = "mecanico:carro",
-                args = {
-                    carro = 'bison2'
-                }
-            }
-        },
-
-    })
-end)
 
 -- Events --
 
@@ -308,7 +222,7 @@ AddEventHandler('mecanico:carro', function(data)
             end)
 
         else
-            ESX.ShowNotification('No eres jefe, regresa mas tarde cuando lo seas')
+            ESX.ShowNotification('No eres jefe, regresa mas tarde cuando lo seas', "error")
         end
     end
 end)
@@ -322,11 +236,13 @@ AddEventHandler('mecanico:outfits', function(data)
             if skin.sex == 0 then
                 TriggerEvent('skinchanger:loadClothes', skin, {
                     sex      = 0,
-                    tshirt_1 = 0,
+                    tshirt_1 = 15,
                     tshirt_2 = 0,
                     arms     = 1,
                     torso_1  = 65,
                     torso_2  = 0,
+                    shoes_1 = 24,
+                    shoes_2 = 0,
                     pants_1  = 39,
                     pants_2  = 0
                 })
@@ -350,6 +266,30 @@ AddEventHandler('mecanico:outfits', function(data)
                 SetModelAsNoLongerNeeded(model)
             end
         end)
+    elseif outfits == "normal" then
+        ESX.TriggerServerCallback('esx_skin:getPlayerSkin', function(skin, jobSkin)
+
+            local model = nil
+
+            if skin.sex == 0  then
+            model = GetHashKey("mp_m_freemode_01")
+            else
+            model = GetHashKey("mp_f_freemode_01")
+            end
+
+            RequestModel(model)
+            while not HasModelLoaded(model) do
+            RequestModel(model)
+            Citizen.Wait(1)
+            end
+
+            SetPlayerModel(PlayerId(), model)
+            SetModelAsNoLongerNeeded(model)
+
+            TriggerEvent('skinchanger:loadSkin', skin)
+            TriggerEvent('esx:restoreLoadout')
+        end)
+        inService = false
     elseif outfits == "casual" then
         ESX.TriggerServerCallback('esx_eden_clotheshop:getPlayerDressing', function(dressing)
             local elements = {}
@@ -386,12 +326,7 @@ end)
 
 RegisterNetEvent('mecanico:inventario')
 AddEventHandler('mecanico:inventario', function(data)
-    local invOpcion = data.invOpcion
-    if invOpcion == 'meter' then
-        OpenPutStocksMenu()
-    elseif invOpcion == 'sacar' then
-        OpenGetStocksMenu()
-    end
+    exports['linden_inventory']:OpenStash({ id = 'Mecanico', slots = 70, job= 'mechanic'})
 end)
 
 RegisterNetEvent('mecanico:sociedad')
@@ -562,24 +497,24 @@ AddEventHandler('mecanico:factura', function()
     local coords    = GetEntityCoords(playerPed)
 --
 ESX.UI.Menu.Open('dialog', GetCurrentResourceName(), 'billing', {
-	title = 'Facuta mecanico'
+    title = 'Factura LSCustom'
 }, function(data, menu)
-	local amount = tonumber(data.value)
+    local amount = tonumber(data.value)
 
-	if amount == nil or amount < 0 then
-		ESX.ShowNotification('Cantidad invalida')
-	else
-		local closestPlayer, closestDistance = ESX.Game.GetClosestPlayer()
-		if closestPlayer == -1 or closestDistance > 3.0 then
-			ESX.ShowNotification('Ningun jugador cerca')
-		else
-			menu.close()
-			TriggerServerEvent('esx_billing:sendBill', GetPlayerServerId(closestPlayer), 'society_mechanic', 'Mecanico', amount)
-		end
-	end
+    if amount == nil or amount < 0 then
+        ESX.ShowNotification('Cantidad invalida')
+    else
+        local closestPlayer, closestDistance = ESX.Game.GetClosestPlayer()
+        if closestPlayer == -1 or closestDistance > 3.0 then
+            ESX.ShowNotification('Ningun jugador cerca')
+        else
+            menu.close()
+            TriggerServerEvent('esx_billing:sendBill', GetPlayerServerId(closestPlayer), 'society_mechanic', 'Mecanico', amount)
+        end
+    end
 end, function(data, menu)
-		menu.close()
-	end)
+        menu.close()
+    end)
 end)
 
 
@@ -599,95 +534,6 @@ function CargarModelo(model)
 	end
 end
 
-OpenPutStocksMenu = function()
-	ESX.TriggerServerCallback('fishii_mechanicjob:getPlayerInventory', function(inventory)
-		local elements = {}
-
-		for i=1, #inventory.items, 1 do
-			local item = inventory.items[i]
-
-			if item.count > 0 then
-				table.insert(elements, {
-					label = item.label .. ' x' .. item.count,
-					type = 'item_standard',
-					value = item.name
-				})
-			end
-		end
-
-		ESX.UI.Menu.Open('default', GetCurrentResourceName(), 'stocks_menu', {
-			title    = 'Inventario',
-			align    = 'bottom-right',
-			elements = elements
-		}, function(data, menu)
-			local itemName = data.current.value
-
-			ESX.UI.Menu.Open('dialog', GetCurrentResourceName(), 'stocks_menu_put_item_count', {
-				title = 'Cantidad'
-			}, function(data2, menu2)
-				local count = tonumber(data2.value)
-
-				if count == nil then
-					ESX.ShowNotification('Cantidad invalida')
-				else
-					menu2.close()
-					menu.close()
-					TriggerServerEvent('fishii_mechanicjob:putStockItems', itemName, count)
-
-					Citizen.Wait(300)
-					OpenPutStocksMenu()
-				end
-			end, function(data2, menu2)
-				menu2.close()
-			end)
-		end, function(data, menu)
-			menu.close()
-		end)
-	end)
-end
-
-OpenGetStocksMenu = function()
-	ESX.TriggerServerCallback('fishii_mechanicjob:getStockItems', function(items)
-		local elements = {}
-
-		for i=1, #items, 1 do
-			table.insert(elements, {
-				label = 'x' .. items[i].count .. ' ' .. items[i].label,
-				value = items[i].name
-			})
-		end
-
-		ESX.UI.Menu.Open('default', GetCurrentResourceName(), 'stocks_menu', {
-			title    = 'Almacén',
-			align    = 'bottom-right',
-			elements = elements
-		}, function(data, menu)
-			local itemName = data.current.value
-
-			ESX.UI.Menu.Open('dialog', GetCurrentResourceName(), 'stocks_menu_get_item_count', {
-				title = 'Cantidad'
-			}, function(data2, menu2)
-				local count = tonumber(data2.value)
-
-				if count == nil then
-					ESX.ShowNotification('Cantidad invalida')
-				else
-					menu2.close()
-					menu.close()
-					TriggerServerEvent('fishii_mechanicjob:getStockItem', itemName, count)
-
-					Citizen.Wait(1000)
-					OpenGetStocksMenu()
-				end
-			end, function(data2, menu2)
-				menu2.close()
-			end)
-		end, function(data, menu)
-			menu.close()
-		end)
-	end)
-end
-
 Citizen.CreateThread(function()
 	for k,v in pairs(Config.Blips) do
 		local blip = AddBlipForCoord(v)
@@ -699,7 +545,13 @@ Citizen.CreateThread(function()
 		SetBlipAsShortRange(blip, true)
 
 		BeginTextCommandSetBlipName('STRING')
-		AddTextComponentSubstringPlayerName('Mecanico')
+		AddTextComponentSubstringPlayerName('LSCustom | Taller Mecanico')
 		EndTextCommandSetBlipName(blip)
 	end
+end)
+
+AddEventHandler('onResourceStop', function(resourceName)
+    if (GetCurrentResourceName() == resourceName) then
+        ESX.UI.Menu.CloseAll()
+    end
 end)
